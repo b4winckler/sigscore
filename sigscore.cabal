@@ -1,0 +1,40 @@
+name:               sigscore
+version:            0.1
+synopsis:           Signature score tool
+homepage:           https://github.com/b4winckler/up-down-signature
+license:            BSD3
+license-file:       LICENSE
+author:             Björn Winckler <bjorn.winckler@gmail.com>
+maintainer:         Björn Winckler <bjorn.winckler@gmail.com>
+copyright:          2012 Björn Winckler
+category:           Math
+build-type:         Simple
+cabal-version:      >= 1.2
+extra-source-files: README.markdown
+
+description:
+  Calculate signature scores for point configurations.
+
+executable sigscore
+  main-is:          Main.hs
+  hs-source-dirs:   src
+  build-depends:    base >= 4 && < 5,
+                    bytestring,
+                    bytestring-lexing,
+                    mwc-random >= 0.12,
+                    up-down-signature >= 0.1
+
+-- test-suite tests
+--   type:             exitcode-stdio-1.0
+--   hs-source-dirs:   tests
+--   main-is:          Tests.hs
+--   ghc-options:      -Wall
+--   build-depends:    base
+--                     -- QuickCheck >= 2
+--                     -- test-framework,
+--                     -- test-framework-quickcheck2,
+--                     -- test-framework-hunit,
+
+source-repository head
+  type:       git
+  location:   https://github.com/b4winckler/sigscore
