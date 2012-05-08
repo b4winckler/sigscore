@@ -43,10 +43,11 @@ main = withSystemRandom $ \gen -> do
         s <- Sig.approxScore gen numPaths $ bins
         -- let s = Sig.score $ trimBins binSize $ map catMaybes $ bin cats elems
         putStrLn $ show s
-        when (lnum `mod` 100 == 0)  $ logStr $ "  " ++ pad 4 (show lnum)
-        when (lnum `mod` 1000 == 0) $ logStrLn ""
       else
         logStrLn $ skippingLine lnum nelems ncats
+    when (lnum `mod` 100 == 0)  $ logStr $ "  " ++ pad 4 (show lnum)
+    when (lnum `mod` 1000 == 0) $ logStrLn ""
+  logStrLn ""
 
 
 numPaths = 10000
