@@ -40,18 +40,19 @@ main = withSystemRandom $ \gen -> do
     if ncats == nelems
       then do
         let bins = map catMaybes $ bin cats elems
-        s <- Sig.approxScore gen numPaths $ bins
-        -- let s = Sig.score $ trimBins binSize $ map catMaybes $ bin cats elems
-        putStrLn $ show s
+        -- Use approximate score if there are too many points through data
+        if countPaths bins > numPaths
+          then Sig.approxScore gen numPaths bins >>= putStrLn . show
+          else putStrLn $ show $ Sig.score bins
       else
         logStrLn $ skippingLine lnum nelems ncats
     when (lnum `mod` 100 == 0)  $ logStr $ "  " ++ pad 4 (show lnum)
     when (lnum `mod` 1000 == 0) $ logStrLn ""
   logStrLn ""
 
+countPaths = product . map length
 
 numPaths = 10000
-binSize  = 4
 
 tooManyCategories = "\
 \WARNING: More than 20 categories.  Break up the data into fewer categories\n\
