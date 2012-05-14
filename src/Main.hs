@@ -4,7 +4,7 @@ module Main where
 import Control.Applicative ((<$>))
 import Control.Monad (forM_, when)
 import Data.List (nub, sort)
-import Data.Maybe (catMaybes)
+import Data.Maybe (catMaybes, isJust)
 import System.Environment (getArgs)
 import System.Exit (exitSuccess)
 import System.Random.MWC (withSystemRandom)
@@ -36,16 +36,15 @@ main = withSystemRandom $ \gen -> do
   -- compute the signature score.
   forM_ (zip [1..] $ tail ls) $ \(lnum,line) -> do
     let elems  = parseDoubles line
-        nelems = length elems
-    if ncats == nelems
-      then do
-        let bins = map catMaybes $ bin cats elems
+        bins   = map catMaybes $ bin cats elems
+    if ncats == length elems && null (filter null bins)
+      then
         -- Use approximate score if there are too many points through data
         if countPaths bins > numPaths
           then Sig.approxScore gen numPaths bins >>= putStrLn . show
           else putStrLn $ show $ Sig.score bins
       else
-        logStrLn $ skippingLine lnum nelems ncats
+        putStrLn "NA"
     when (lnum `mod` 100 == 0)  $ logStr $ "  " ++ pad 4 (show lnum)
     when (lnum `mod` 1000 == 0) $ logStrLn ""
   logStrLn ""
@@ -66,7 +65,3 @@ foundCategories xs = "Found " ++ show n ++ " "
   where
     cs = nub xs
     n  = length cs
-
-skippingLine lnum actual expected =
-  "WARNING: Skipping line " ++ show lnum ++
-  " (expected " ++ show expected ++ " elements, got " ++ show actual ++ ")"
