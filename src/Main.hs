@@ -1,10 +1,12 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 module Main where
 
 import Control.Applicative ((<$>))
 import Control.Monad (forM_, when)
 import Data.List (nub, sort)
-import Data.Maybe (catMaybes, isJust)
+import Data.Maybe (catMaybes, isNothing, fromJust)
+import System.Console.CmdArgs (cmdArgs, (&=), Data(..), Typeable(..), typ,
+                               help, def, args, typFile, summary, program)
 import System.Environment (getArgs)
 import System.Exit (exitSuccess)
 import System.Random.MWC (withSystemRandom)
@@ -16,9 +18,29 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import qualified Data.UpDownSignature as Sig
 
 
+data Args = Args {
+    iter  :: Int
+  , fname :: Maybe FilePath
+  } deriving (Show, Data, Typeable)
+
+defaultArgs :: Args
+defaultArgs = Args {
+      iter  = 10000 &= typ "NUM" &=
+              help "Max number of iterations (default 10000)"
+    , fname = def &= args &= typFile
+    } &= summary "sigscore v0.2, (C) 2012 Björn Winckler"
+      &= program "sigscore"
+
 main = withSystemRandom $ \gen -> do
-  as <- getArgs
-  ls <- B.lines <$> if null as then B.getContents else B.readFile (head as)
+  as <- cmdArgs $ defaultArgs
+
+  -- Read lines from file or stdin (if no file is specified)
+  ls <- B.lines <$> case fname as of
+                      Just fn -> B.readFile fn
+                      _       -> B.getContents
+
+  -- Sanity check 'iter' argument
+  let maxIter = if iter as > 0 then iter as else iter defaultArgs
 
   when (null ls) exitSuccess   -- Nothing to do!
 
@@ -40,8 +62,8 @@ main = withSystemRandom $ \gen -> do
     if ncats == length elems && null (filter null bins)
       then
         -- Use approximate score if there are too many points through data
-        if countPaths bins > numPaths
-          then Sig.approxScore gen numPaths bins >>= putStrLn . show
+        if countPaths bins > maxIter
+          then Sig.approxScore gen maxIter bins >>= putStrLn . show
           else putStrLn $ show $ Sig.score bins
       else
         putStrLn "NA"
@@ -50,8 +72,6 @@ main = withSystemRandom $ \gen -> do
   logStrLn ""
 
 countPaths = product . map length
-
-numPaths = 10000
 
 tooManyCategories = "\
 \WARNING: More than 20 categories.  Break up the data into fewer categories\n\
