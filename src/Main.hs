@@ -63,13 +63,16 @@ main = withSystemRandom $ \gen -> do
       then
         -- Use approximate score if there are too many points through data
         if countPaths bins > maxIter
-          then Sig.approxScore gen maxIter bins >>= putStrLn . show
-          else putStrLn $ show $ Sig.score bins
+          then Sig.approxScore gen maxIter bins >>= putStrLn . showPair
+          else putStrLn $ showPair $ Sig.score bins
       else
-        putStrLn "NA"
+        putStrLn "NA NA"
     when (lnum `mod` 100 == 0)  $ logStr $ "  " ++ pad 4 (show lnum)
     when (lnum `mod` 1000 == 0) $ logStrLn ""
   logStrLn ""
+
+
+showPair (x,y) = show x ++ " " ++ show y
 
 countPaths = product . map length
 
