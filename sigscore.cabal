@@ -1,5 +1,5 @@
 name:               sigscore
-version:            0.2
+version:            0.3
 synopsis:           Signature score tool
 homepage:           https://github.com/b4winckler/up-down-signature
 license:            BSD3
@@ -22,7 +22,7 @@ executable sigscore
                     bytestring,
                     bytestring-lexing,
                     mwc-random >= 0.12,
-                    up-down-signature >= 0.1,
+                    up-down-signature >= 0.2,
                     cmdargs >= 0.10
 
 -- test-suite tests

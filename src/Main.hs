@@ -28,7 +28,7 @@ defaultArgs = Args {
       iter  = 10000 &= typ "NUM" &=
               help "Max number of iterations (default 10000)"
     , fname = def &= args &= typFile
-    } &= summary "sigscore v0.2, (C) 2012 Björn Winckler"
+    } &= summary "sigscore v0.3, (C) 2012 Björn Winckler"
       &= program "sigscore"
 
 main = withSystemRandom $ \gen -> do
